@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  # PostgreSQL service
+  postgres:
+    image: postgres:latest
+    container_name: postgres-hotel
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hotel
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data  # persistance des données
+    ports:
+      - "5432:5432"  # expose le port 5432 pour accéder à PostgreSQL
+    networks:
+      - hotel-net
+
+  # Reservation Service (Node.js)
+  reservation-service:
+    build: ./reservation_node  # chemin vers le service de réservation
+    container_name: reservation-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=hotel_reservation
+      - BILLING_URL=http://billing-service:8000
+      - ROOM_SOAP_WSDL=http://room-service:8081/RoomService?wsdl
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres  # Assurez-vous que PostgreSQL est prêt avant de démarrer le service de réservation
+    networks:
+      - hotel-net
+
+  # Optionnel: Billing Service (FastAPI)
+  billing-service:
+    build: ./billing-service
+    container_name: billing-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - hotel-net
+
+networks:
+  hotel-net:
+    driver: bridge
