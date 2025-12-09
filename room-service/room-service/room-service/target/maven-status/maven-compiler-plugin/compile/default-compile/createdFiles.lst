@@ -1,0 +1,7 @@
+com\hotel\room\ChambreService.class
+com\hotel\room\DbConfig.class
+com\hotel\room\Chambre.class
+com\hotel\room\ChambreServicePublisher.class
+com\hotel\room\ChambreDao.class
+com\hotel\Main.class
+com\hotel\room\ChambreServiceImpl.class
